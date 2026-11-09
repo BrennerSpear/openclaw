@@ -84,7 +84,7 @@ describe("cron tool", () => {
       name: "wake-up",
       schedule: { kind: "at", atMs: 123 },
       sessionTarget: "main",
-      postRun: null,
+      wakeMode: "next-heartbeat",
       payload: { kind: "systemEvent", text: "hello" },
     });
   });

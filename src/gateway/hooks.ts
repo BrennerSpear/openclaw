@@ -134,21 +134,20 @@ export function normalizeHookHeaders(req: IncomingMessage) {
 export function normalizeWakePayload(
   payload: Record<string, unknown>,
 ):
-  | { ok: true; value: { text: string; mode: "trigger-heartbeat" | null } }
+  | { ok: true; value: { text: string; mode: "now" | "next-heartbeat" } }
   | { ok: false; error: string } {
   const text = typeof payload.text === "string" ? payload.text.trim() : "";
   if (!text) {
     return { ok: false, error: "text required" };
   }
-  const mode: "trigger-heartbeat" | null =
-    payload.mode === null || payload.mode === "next-heartbeat" ? null : "trigger-heartbeat";
+  const mode = payload.mode === "next-heartbeat" ? "next-heartbeat" : "now";
   return { ok: true, value: { text, mode } };
 }
 
 export type HookAgentPayload = {
   message: string;
   name: string;
-  postRun: "trigger-heartbeat" | null;
+  wakeMode: "now" | "next-heartbeat";
   sessionKey: string;
   deliver: boolean;
   channel: HookMessageChannel;
@@ -198,15 +197,7 @@ export function normalizeAgentPayload(
   }
   const nameRaw = payload.name;
   const name = typeof nameRaw === "string" && nameRaw.trim() ? nameRaw.trim() : "Hook";
-  // Support both postRun (new) and wakeMode (deprecated) from payloads
-  const postRun: "trigger-heartbeat" | null =
-    "postRun" in payload
-      ? payload.postRun === null
-        ? null
-        : "trigger-heartbeat"
-      : payload.wakeMode === "next-heartbeat"
-        ? null
-        : "trigger-heartbeat";
+  const wakeMode = payload.wakeMode === "next-heartbeat" ? "next-heartbeat" : "now";
   const sessionKeyRaw = payload.sessionKey;
   const idFactory = opts?.idFactory ?? randomUUID;
   const sessionKey =
@@ -238,7 +229,7 @@ export function normalizeAgentPayload(
     value: {
       message,
       name,
-      postRun,
+      wakeMode,
       sessionKey,
       deliver,
       channel,

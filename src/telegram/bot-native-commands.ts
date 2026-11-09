@@ -45,13 +45,17 @@ import { TelegramUpdateKeyContext } from "./bot-updates.js";
 import { TelegramBotOptions } from "./bot.js";
 import { deliverReplies } from "./bot/delivery.js";
 import {
-  buildTelegramThreadParams,
   buildSenderName,
   buildTelegramGroupFrom,
   buildTelegramGroupPeerId,
   resolveTelegramForumThreadId,
-  resolveTelegramThreadSpec,
 } from "./bot/helpers.js";
+import {
+  buildTelegramTopicLabel,
+  cacheTelegramTopicName,
+  extractTelegramTopicNameFromMessage,
+  getCachedTelegramTopicName,
+} from "./topic-cache.js";
 import { buildInlineKeyboard } from "./send.js";
 
 const EMPTY_RESPONSE_FALLBACK = "No response generated. Please try again.";
@@ -411,12 +415,7 @@ export const registerTelegramNativeCommands = ({
             commandAuthorized,
           } = auth;
           const messageThreadId = (msg as { message_thread_id?: number }).message_thread_id;
-          const threadSpec = resolveTelegramThreadSpec({
-            isGroup,
-            isForum,
-            messageThreadId,
-          });
-          const threadParams = buildTelegramThreadParams(threadSpec) ?? {};
+          const threadIdForSend = isGroup ? resolvedThreadId : messageThreadId;
 
           const commandDefinition = findCommandByNativeName(command.name, "telegram");
           const rawText = ctx.match?.trim() ?? "";
@@ -463,7 +462,7 @@ export const registerTelegramNativeCommands = ({
               fn: () =>
                 bot.api.sendMessage(chatId, title, {
                   ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
-                  ...threadParams,
+                  ...(threadIdForSend != null ? { message_thread_id: threadIdForSend } : {}),
                 }),
             });
             return;
@@ -477,9 +476,38 @@ export const registerTelegramNativeCommands = ({
               id: isGroup ? buildTelegramGroupPeerId(chatId, resolvedThreadId) : String(chatId),
             },
           });
+          const agentList = Array.isArray(cfg.agents?.list) ? cfg.agents.list : [];
+          const hasMultipleAgents = agentList.length > 1;
+          const topicNameFromMessage =
+            resolvedThreadId != null
+              ? extractTelegramTopicNameFromMessage(
+                  msg as {
+                    forum_topic_created?: { name?: string };
+                    forum_topic_edited?: { name?: string };
+                  },
+                )
+              : null;
+          if (resolvedThreadId != null && topicNameFromMessage) {
+            cacheTelegramTopicName({
+              chatId,
+              topicId: resolvedThreadId,
+              name: topicNameFromMessage,
+            });
+          }
+          const cachedTopicName =
+            resolvedThreadId != null ? getCachedTelegramTopicName(chatId, resolvedThreadId) : null;
+          const threadLabel =
+            isGroup && resolvedThreadId != null
+              ? buildTelegramTopicLabel({
+                  topicId: resolvedThreadId,
+                  topicName: cachedTopicName ?? topicNameFromMessage,
+                  agentId: route.agentId,
+                  multiAgent: hasMultipleAgents,
+                })
+              : undefined;
           const baseSessionKey = route.sessionKey;
           // DMs: use raw messageThreadId for thread sessions (not resolvedThreadId which is for forums)
-          const dmThreadId = threadSpec.scope === "dm" ? threadSpec.id : undefined;
+          const dmThreadId = !isGroup ? messageThreadId : undefined;
           const threadKeys =
             dmThreadId != null
               ? resolveThreadSessionKeys({
@@ -514,6 +542,7 @@ export const registerTelegramNativeCommands = ({
             To: `slash:${senderId || chatId}`,
             ChatType: isGroup ? "group" : "direct",
             ConversationLabel: conversationLabel,
+            ThreadLabel: threadLabel,
             GroupSubject: isGroup ? (msg.chat.title ?? undefined) : undefined,
             GroupSystemPrompt: isGroup ? groupSystemPrompt : undefined,
             SenderName: buildSenderName(msg),
@@ -528,7 +557,7 @@ export const registerTelegramNativeCommands = ({
             SessionKey: `telegram:slash:${senderId || chatId}`,
             AccountId: route.accountId,
             CommandTargetSessionKey: sessionKey,
-            MessageThreadId: threadSpec.id,
+            MessageThreadId: threadIdForSend,
             IsForum: isForum,
             // Originating context for sub-agent announce routing
             OriginatingChannel: "telegram" as const,
@@ -560,7 +589,7 @@ export const registerTelegramNativeCommands = ({
                   bot,
                   replyToMode,
                   textLimit,
-                  thread: threadSpec,
+                  messageThreadId: threadIdForSend,
                   tableMode,
                   chunkMode,
                   linkPreview: telegramCfg.linkPreview,
@@ -592,7 +621,7 @@ export const registerTelegramNativeCommands = ({
               bot,
               replyToMode,
               textLimit,
-              thread: threadSpec,
+              messageThreadId: threadIdForSend,
               tableMode,
               chunkMode,
               linkPreview: telegramCfg.linkPreview,
@@ -637,13 +666,9 @@ export const registerTelegramNativeCommands = ({
           if (!auth) {
             return;
           }
-          const { senderId, commandAuthorized, isGroup, isForum } = auth;
+          const { resolvedThreadId, senderId, commandAuthorized, isGroup } = auth;
           const messageThreadId = (msg as { message_thread_id?: number }).message_thread_id;
-          const threadSpec = resolveTelegramThreadSpec({
-            isGroup,
-            isForum,
-            messageThreadId,
-          });
+          const threadIdForSend = isGroup ? resolvedThreadId : messageThreadId;
 
           const result = await executePluginCommand({
             command: match.command,
@@ -669,7 +694,7 @@ export const registerTelegramNativeCommands = ({
             bot,
             replyToMode,
             textLimit,
-            thread: threadSpec,
+            messageThreadId: threadIdForSend,
             tableMode,
             chunkMode,
             linkPreview: telegramCfg.linkPreview,

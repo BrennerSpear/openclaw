@@ -358,7 +358,7 @@ Save to `~/.openclaw/openclaw.json` and you can DM the bot from that number.
         id: "gmail-hook",
         match: { path: "gmail" },
         action: "agent",
-        postRun: "trigger-heartbeat",
+        wakeMode: "now",
         name: "Gmail",
         sessionKey: "hook:gmail:{{messages[0].id}}",
         messageTemplate: "From: {{messages[0].from}}\nSubject: {{messages[0].subject}}",

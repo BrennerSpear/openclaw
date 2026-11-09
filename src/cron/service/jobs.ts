@@ -100,7 +100,7 @@ export function createJob(state: CronServiceState, input: CronJobCreate): CronJo
     updatedAtMs: now,
     schedule: input.schedule,
     sessionTarget: input.sessionTarget,
-    postRun: input.postRun,
+    wakeMode: input.wakeMode,
     payload: input.payload,
     isolation: input.isolation,
     state: {
@@ -131,8 +131,8 @@ export function applyJobPatch(job: CronJob, patch: CronJobPatch) {
   if (patch.sessionTarget) {
     job.sessionTarget = patch.sessionTarget;
   }
-  if ("postRun" in patch) {
-    job.postRun = patch.postRun!;
+  if (patch.wakeMode) {
+    job.wakeMode = patch.wakeMode;
   }
   if (patch.payload) {
     job.payload = mergeCronPayload(job.payload, patch.payload);

@@ -7,13 +7,12 @@ import { formatCliCommand } from "../cli/command-format.js";
 import {
   OpenClawSchema,
   CONFIG_PATH,
-  migrateLegacyConfigBackups,
   migrateLegacyConfig,
   readConfigFileSnapshot,
 } from "../config/config.js";
 import { applyPluginAutoEnable } from "../config/plugin-auto-enable.js";
 import { note } from "../terminal/note.js";
-import { resolveHomeDir, shortenHomePath } from "../utils.js";
+import { resolveHomeDir } from "../utils.js";
 import { normalizeLegacyConfigValues } from "./doctor-legacy-config.js";
 import { autoMigrateLegacyStateDir } from "./doctor-state-migrations.js";
 
@@ -210,20 +209,6 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
   const legacyConfigChanges = await maybeMigrateLegacyConfig();
   if (legacyConfigChanges.length > 0) {
     note(legacyConfigChanges.map((entry) => `- ${entry}`).join("\n"), "Doctor changes");
-  }
-
-  const backupMigration = await migrateLegacyConfigBackups();
-  if (backupMigration.moved.length > 0) {
-    note(
-      `- Config backups moved to ${shortenHomePath(backupMigration.backupDir)} (${backupMigration.moved.length})`,
-      "Doctor changes",
-    );
-  }
-  if (backupMigration.skipped.length > 0) {
-    note(
-      `- ${backupMigration.skipped.length} config backups could not be moved.`,
-      "Doctor warnings",
-    );
   }
 
   let snapshot = await readConfigFileSnapshot();

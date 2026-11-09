@@ -21,10 +21,10 @@ export function createGatewayHooksRequestHandler(params: {
 }) {
   const { deps, getHooksConfig, bindHost, port, logHooks } = params;
 
-  const dispatchWakeHook = (value: { text: string; mode: "trigger-heartbeat" | null }) => {
+  const dispatchWakeHook = (value: { text: string; mode: "now" | "next-heartbeat" }) => {
     const sessionKey = resolveMainSessionKeyFromConfig();
     enqueueSystemEvent(value.text, { sessionKey });
-    if (value.mode === "trigger-heartbeat") {
+    if (value.mode === "now") {
       requestHeartbeatNow({ reason: "hook:wake" });
     }
   };
@@ -32,7 +32,7 @@ export function createGatewayHooksRequestHandler(params: {
   const dispatchAgentHook = (value: {
     message: string;
     name: string;
-    postRun: "trigger-heartbeat" | null;
+    wakeMode: "now" | "next-heartbeat";
     sessionKey: string;
     deliver: boolean;
     channel: HookMessageChannel;
@@ -54,7 +54,7 @@ export function createGatewayHooksRequestHandler(params: {
       updatedAtMs: now,
       schedule: { kind: "at", atMs: now },
       sessionTarget: "isolated",
-      postRun: value.postRun,
+      wakeMode: value.wakeMode,
       payload: {
         kind: "agentTurn",
         message: value.message,
@@ -87,7 +87,7 @@ export function createGatewayHooksRequestHandler(params: {
         enqueueSystemEvent(`${prefix}: ${summary}`.trim(), {
           sessionKey: mainSessionKey,
         });
-        if (value.postRun === "trigger-heartbeat") {
+        if (value.wakeMode === "now") {
           requestHeartbeatNow({ reason: `hook:${jobId}` });
         }
       } catch (err) {
@@ -95,7 +95,7 @@ export function createGatewayHooksRequestHandler(params: {
         enqueueSystemEvent(`Hook ${value.name} (error): ${String(err)}`, {
           sessionKey: mainSessionKey,
         });
-        if (value.postRun === "trigger-heartbeat") {
+        if (value.wakeMode === "now") {
           requestHeartbeatNow({ reason: `hook:${jobId}:error` });
         }
       }

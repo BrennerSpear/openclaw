@@ -6,7 +6,7 @@ extension CronJobEditor {
         self.agentId = "ops"
         self.enabled = true
         self.sessionTarget = .isolated
-        self.postRun = .triggerHeartbeat
+        self.wakeMode = .now
 
         self.scheduleKind = .every
         self.everyText = "15m"

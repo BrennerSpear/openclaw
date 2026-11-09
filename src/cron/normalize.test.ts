@@ -8,7 +8,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { kind: "cron", expr: "* * * * *" },
       sessionTarget: "isolated",
-      postRun: "trigger-heartbeat",
+      wakeMode: "now",
       payload: {
         kind: "agentTurn",
         message: "hi",
@@ -29,7 +29,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { kind: "cron", expr: "* * * * *" },
       sessionTarget: "isolated",
-      postRun: "trigger-heartbeat",
+      wakeMode: "now",
       agentId: " Ops ",
       payload: {
         kind: "agentTurn",
@@ -44,7 +44,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { kind: "cron", expr: "* * * * *" },
       sessionTarget: "isolated",
-      postRun: "trigger-heartbeat",
+      wakeMode: "now",
       agentId: null,
       payload: {
         kind: "agentTurn",
@@ -61,7 +61,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { kind: "cron", expr: "* * * * *" },
       sessionTarget: "isolated",
-      postRun: "trigger-heartbeat",
+      wakeMode: "now",
       payload: {
         kind: "agentTurn",
         message: "hi",
@@ -81,7 +81,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { at: "2026-01-12T18:00:00" },
       sessionTarget: "main",
-      postRun: null,
+      wakeMode: "next-heartbeat",
       payload: {
         kind: "systemEvent",
         text: "hi",
@@ -99,7 +99,7 @@ describe("normalizeCronJobCreate", () => {
       enabled: true,
       schedule: { kind: "at", atMs: "2026-01-12T18:00:00" },
       sessionTarget: "main",
-      postRun: null,
+      wakeMode: "next-heartbeat",
       payload: {
         kind: "systemEvent",
         text: "hi",

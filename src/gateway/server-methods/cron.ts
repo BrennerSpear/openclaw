@@ -30,13 +30,10 @@ export const cronHandlers: GatewayRequestHandlers = {
       return;
     }
     const p = params as {
-      mode: "trigger-heartbeat" | "now" | "next-heartbeat" | null;
+      mode: "now" | "next-heartbeat";
       text: string;
     };
-    // Map legacy wake mode values
-    const mode: "trigger-heartbeat" | null =
-      p.mode === "now" || p.mode === "trigger-heartbeat" ? "trigger-heartbeat" : null;
-    const result = context.cron.wake({ mode, text: p.text });
+    const result = context.cron.wake({ mode: p.mode, text: p.text });
     respond(true, result, undefined);
   },
   "cron.list": async ({ params, respond, context }) => {

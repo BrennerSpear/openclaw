@@ -7,8 +7,9 @@ enum CronSessionTarget: String, CaseIterable, Identifiable, Codable {
     var id: String { self.rawValue }
 }
 
-enum CronPostRun: String, CaseIterable, Identifiable, Codable {
-    case triggerHeartbeat = "trigger-heartbeat"
+enum CronWakeMode: String, CaseIterable, Identifiable, Codable {
+    case now
+    case nextHeartbeat = "next-heartbeat"
 
     var id: String { self.rawValue }
 }
@@ -154,7 +155,7 @@ struct CronJob: Identifiable, Codable, Equatable {
     let updatedAtMs: Int
     let schedule: CronSchedule
     let sessionTarget: CronSessionTarget
-    let postRun: CronPostRun?
+    let wakeMode: CronWakeMode
     let payload: CronPayload
     let isolation: CronIsolation?
     let state: CronJobState

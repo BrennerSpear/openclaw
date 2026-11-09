@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `openclaw config` (get/set/unset config values, manage backups)"
+summary: "CLI reference for `openclaw config` (get/set/unset config values)"
 read_when:
   - You want to read or edit config non-interactively
 title: "config"
@@ -48,11 +48,3 @@ openclaw config set channels.whatsapp.groups '["*"]' --json
 ```
 
 Restart the gateway after edits.
-
-## Backups
-
-Move legacy config backups (e.g. `openclaw.json.bak.*`) into the `backups/` folder:
-
-```bash
-openclaw config backups
-```

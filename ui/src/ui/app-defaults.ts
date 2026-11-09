@@ -22,7 +22,7 @@ export const DEFAULT_CRON_FORM: CronFormState = {
   cronExpr: "0 7 * * *",
   cronTz: "",
   sessionTarget: "main",
-  postRun: null,
+  wakeMode: "next-heartbeat",
   payloadKind: "systemEvent",
   payloadText: "",
   deliver: false,

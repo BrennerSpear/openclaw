@@ -38,22 +38,16 @@ function buildChannelOptions(props: CronProps): string[] {
   }
   const seen = new Set<string>();
   return options.filter((value) => {
-    if (seen.has(value)) {
-      return false;
-    }
+    if (seen.has(value)) return false;
     seen.add(value);
     return true;
   });
 }
 
 function resolveChannelLabel(props: CronProps, channel: string): string {
-  if (channel === "last") {
-    return "last";
-  }
+  if (channel === "last") return "last";
   const meta = props.channelMeta?.find((entry) => entry.id === channel);
-  if (meta?.label) {
-    return meta.label;
-  }
+  if (meta?.label) return meta.label;
   return props.channelLabels?.[channel] ?? channel;
 }
 
@@ -159,18 +153,16 @@ export function renderCron(props: CronProps) {
             </select>
           </label>
           <label class="field">
-            <span>Post-run</span>
+            <span>Wake mode</span>
             <select
-              .value=${props.form.postRun ?? ""}
-              @change=${(e: Event) => {
-                const val = (e.target as HTMLSelectElement).value;
+              .value=${props.form.wakeMode}
+              @change=${(e: Event) =>
                 props.onFormChange({
-                  postRun: val === "trigger-heartbeat" ? "trigger-heartbeat" : null,
-                });
-              }}
+                  wakeMode: (e.target as HTMLSelectElement).value as CronFormState["wakeMode"],
+                })}
             >
-              <option value="">None</option>
-              <option value="trigger-heartbeat">Trigger heartbeat</option>
+              <option value="next-heartbeat">Next heartbeat</option>
+              <option value="now">Now</option>
             </select>
           </label>
           <label class="field">
@@ -220,7 +212,8 @@ export function renderCron(props: CronProps) {
 	                    .value=${props.form.channel || "last"}
 	                    @change=${(e: Event) =>
                         props.onFormChange({
-                          channel: (e.target as HTMLSelectElement).value,
+                          channel: (e.target as HTMLSelectElement)
+                            .value as CronFormState["channel"],
                         })}
 	                  >
 	                    ${channelOptions.map(
@@ -398,7 +391,7 @@ function renderJob(job: CronJob, props: CronProps) {
         <div class="chip-row" style="margin-top: 6px;">
           <span class="chip">${job.enabled ? "enabled" : "disabled"}</span>
           <span class="chip">${job.sessionTarget}</span>
-          <span class="chip">${job.postRun ?? "none"}</span>
+          <span class="chip">${job.wakeMode}</span>
         </div>
       </div>
       <div class="list-meta">

@@ -13,7 +13,7 @@ function createJob(id: string): CronJob {
     updatedAtMs: 0,
     schedule: { kind: "cron", expr: "0 9 * * *" },
     sessionTarget: "main",
-    postRun: null,
+    wakeMode: "next-heartbeat",
     payload: { kind: "systemEvent", text: "ping" },
   };
 }
@@ -63,7 +63,7 @@ describe("cron view", () => {
       container,
     );
 
-    const row = container.querySelector(".list-item-clickable");
+    const row = container.querySelector(".list-item-clickable") as HTMLElement | null;
     expect(row).not.toBeNull();
     row?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 

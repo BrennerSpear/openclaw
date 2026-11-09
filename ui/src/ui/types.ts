@@ -393,8 +393,7 @@ export type CronSchedule =
   | { kind: "cron"; expr: string; tz?: string };
 
 export type CronSessionTarget = "main" | "isolated";
-export type CronPostRun = "trigger-heartbeat" | null;
-/** @deprecated */ export type CronWakeMode = "next-heartbeat" | "now";
+export type CronWakeMode = "next-heartbeat" | "now";
 
 export type CronPayload =
   | { kind: "systemEvent"; text: string }
@@ -441,7 +440,7 @@ export type CronJob = {
   updatedAtMs: number;
   schedule: CronSchedule;
   sessionTarget: CronSessionTarget;
-  postRun: CronPostRun;
+  wakeMode: CronWakeMode;
   payload: CronPayload;
   isolation?: CronIsolation;
   state?: CronJobState;

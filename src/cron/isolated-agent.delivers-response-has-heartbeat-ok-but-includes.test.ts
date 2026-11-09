@@ -72,7 +72,7 @@ function makeJob(payload: CronJob["payload"]): CronJob {
     updatedAtMs: now,
     schedule: { kind: "every", everyMs: 60_000 },
     sessionTarget: "isolated",
-    postRun: "trigger-heartbeat",
+    wakeMode: "now",
     payload,
     state: {},
     isolation: { postToMainPrefix: "Cron" },

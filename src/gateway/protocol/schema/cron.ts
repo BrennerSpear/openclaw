@@ -110,9 +110,7 @@ export const CronJobSchema = Type.Object(
     updatedAtMs: Type.Integer({ minimum: 0 }),
     schedule: CronScheduleSchema,
     sessionTarget: Type.Union([Type.Literal("main"), Type.Literal("isolated")]),
-    postRun: Type.Union([Type.Literal("trigger-heartbeat"), Type.Null()]),
-    /** @deprecated Use postRun instead. */
-    wakeMode: Type.Optional(Type.Union([Type.Literal("next-heartbeat"), Type.Literal("now")])),
+    wakeMode: Type.Union([Type.Literal("next-heartbeat"), Type.Literal("now")]),
     payload: CronPayloadSchema,
     isolation: Type.Optional(CronIsolationSchema),
     state: CronJobStateSchema,
@@ -138,9 +136,7 @@ export const CronAddParamsSchema = Type.Object(
     deleteAfterRun: Type.Optional(Type.Boolean()),
     schedule: CronScheduleSchema,
     sessionTarget: Type.Union([Type.Literal("main"), Type.Literal("isolated")]),
-    postRun: Type.Optional(Type.Union([Type.Literal("trigger-heartbeat"), Type.Null()])),
-    /** @deprecated Use postRun instead. */
-    wakeMode: Type.Optional(Type.Union([Type.Literal("next-heartbeat"), Type.Literal("now")])),
+    wakeMode: Type.Union([Type.Literal("next-heartbeat"), Type.Literal("now")]),
     payload: CronPayloadSchema,
     isolation: Type.Optional(CronIsolationSchema),
   },
@@ -156,8 +152,6 @@ export const CronJobPatchSchema = Type.Object(
     deleteAfterRun: Type.Optional(Type.Boolean()),
     schedule: Type.Optional(CronScheduleSchema),
     sessionTarget: Type.Optional(Type.Union([Type.Literal("main"), Type.Literal("isolated")])),
-    postRun: Type.Optional(Type.Union([Type.Literal("trigger-heartbeat"), Type.Null()])),
-    /** @deprecated Use postRun instead. */
     wakeMode: Type.Optional(Type.Union([Type.Literal("next-heartbeat"), Type.Literal("now")])),
     payload: Type.Optional(CronPayloadPatchSchema),
     isolation: Type.Optional(CronIsolationSchema),

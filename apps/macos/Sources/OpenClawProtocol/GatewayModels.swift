@@ -1705,7 +1705,7 @@ public struct CronJob: Codable, Sendable {
     public let updatedatms: Int
     public let schedule: AnyCodable
     public let sessiontarget: AnyCodable
-    public let postrun: AnyCodable?
+    public let wakemode: AnyCodable
     public let payload: AnyCodable
     public let isolation: [String: AnyCodable]?
     public let state: [String: AnyCodable]
@@ -1721,7 +1721,7 @@ public struct CronJob: Codable, Sendable {
         updatedatms: Int,
         schedule: AnyCodable,
         sessiontarget: AnyCodable,
-        postrun: AnyCodable?,
+        wakemode: AnyCodable,
         payload: AnyCodable,
         isolation: [String: AnyCodable]?,
         state: [String: AnyCodable]
@@ -1736,7 +1736,7 @@ public struct CronJob: Codable, Sendable {
         self.updatedatms = updatedatms
         self.schedule = schedule
         self.sessiontarget = sessiontarget
-        self.postrun = postrun
+        self.wakemode = wakemode
         self.payload = payload
         self.isolation = isolation
         self.state = state
@@ -1752,7 +1752,7 @@ public struct CronJob: Codable, Sendable {
         case updatedatms = "updatedAtMs"
         case schedule
         case sessiontarget = "sessionTarget"
-        case postrun = "postRun"
+        case wakemode = "wakeMode"
         case payload
         case isolation
         case state
@@ -1783,7 +1783,7 @@ public struct CronAddParams: Codable, Sendable {
     public let deleteafterrun: Bool?
     public let schedule: AnyCodable
     public let sessiontarget: AnyCodable
-    public let postrun: AnyCodable?
+    public let wakemode: AnyCodable
     public let payload: AnyCodable
     public let isolation: [String: AnyCodable]?
 
@@ -1795,7 +1795,7 @@ public struct CronAddParams: Codable, Sendable {
         deleteafterrun: Bool?,
         schedule: AnyCodable,
         sessiontarget: AnyCodable,
-        postrun: AnyCodable?,
+        wakemode: AnyCodable,
         payload: AnyCodable,
         isolation: [String: AnyCodable]?
     ) {
@@ -1806,7 +1806,7 @@ public struct CronAddParams: Codable, Sendable {
         self.deleteafterrun = deleteafterrun
         self.schedule = schedule
         self.sessiontarget = sessiontarget
-        self.postrun = postrun
+        self.wakemode = wakemode
         self.payload = payload
         self.isolation = isolation
     }
@@ -1818,7 +1818,7 @@ public struct CronAddParams: Codable, Sendable {
         case deleteafterrun = "deleteAfterRun"
         case schedule
         case sessiontarget = "sessionTarget"
-        case postrun = "postRun"
+        case wakemode = "wakeMode"
         case payload
         case isolation
     }

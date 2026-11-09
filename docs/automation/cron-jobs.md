@@ -36,7 +36,7 @@ openclaw cron add \
   --at "2026-02-01T16:00:00Z" \
   --session main \
   --system-event "Reminder: check the cron docs draft" \
-  --post-run trigger-heartbeat \
+  --wake now \
   --delete-after-run
 
 openclaw cron list
@@ -122,10 +122,8 @@ local timezone is used.
 Main jobs enqueue a system event and optionally wake the heartbeat runner.
 They must use `payload.kind = "systemEvent"`.
 
-- `postRun: null` (default): event waits for the next scheduled heartbeat.
-- `postRun: "trigger-heartbeat"`: event triggers an immediate heartbeat run.
-
-> **Backwards compatibility:** The old `wakeMode` field (`"now"` maps to `"trigger-heartbeat"`, `"next-heartbeat"` maps to `null`) is still accepted.
+- `wakeMode: "next-heartbeat"` (default): event waits for the next scheduled heartbeat.
+- `wakeMode: "now"`: event triggers an immediate heartbeat run.
 
 This is the best fit when you want the normal heartbeat prompt + main-session context.
 See [Heartbeat](/gateway/heartbeat).
@@ -139,7 +137,7 @@ Key behaviors:
 - Prompt is prefixed with `[cron:<jobId> <job name>]` for traceability.
 - Each run starts a **fresh session id** (no prior conversation carry-over).
 - A summary is posted to the main session (prefix `Cron`, configurable).
-- `postRun: "trigger-heartbeat"` triggers an immediate heartbeat after posting the summary.
+- `wakeMode: "now"` triggers an immediate heartbeat after posting the summary.
 - If `payload.deliver: true`, output is delivered to a channel; otherwise it stays internal.
 
 Use isolated jobs for noisy, frequent, or "background chores" that shouldn't spam
@@ -234,7 +232,7 @@ One-shot, main session job (system event):
   "name": "Reminder",
   "schedule": { "kind": "at", "atMs": 1738262400000 },
   "sessionTarget": "main",
-  "postRun": "trigger-heartbeat",
+  "wakeMode": "now",
   "payload": { "kind": "systemEvent", "text": "Reminder text" },
   "deleteAfterRun": true
 }
@@ -247,7 +245,7 @@ Recurring, isolated job with delivery:
   "name": "Morning brief",
   "schedule": { "kind": "cron", "expr": "0 7 * * *", "tz": "America/Los_Angeles" },
   "sessionTarget": "isolated",
-  "postRun": null,
+  "wakeMode": "next-heartbeat",
   "payload": {
     "kind": "agentTurn",
     "message": "Summarize overnight updates.",
@@ -266,7 +264,7 @@ Notes:
 - `atMs` and `everyMs` are epoch milliseconds.
 - `sessionTarget` must be `"main"` or `"isolated"` and must match `payload.kind`.
 - Optional fields: `agentId`, `description`, `enabled`, `deleteAfterRun`, `isolation`.
-- `postRun` defaults to `null` when omitted. The old `wakeMode` field is still accepted for backwards compatibility (`"now"` -> `"trigger-heartbeat"`, `"next-heartbeat"` -> `null`).
+- `wakeMode` defaults to `"next-heartbeat"` when omitted.
 
 ### cron.update params
 
@@ -328,7 +326,7 @@ openclaw cron add \
   --at "2026-01-12T18:00:00Z" \
   --session main \
   --system-event "Reminder: submit expense report." \
-  --post-run trigger-heartbeat \
+  --wake now \
   --delete-after-run
 ```
 
@@ -340,7 +338,7 @@ openclaw cron add \
   --at "20m" \
   --session main \
   --system-event "Next heartbeat: check calendar." \
-  --post-run trigger-heartbeat
+  --wake now
 ```
 
 Recurring isolated job (deliver to WhatsApp):

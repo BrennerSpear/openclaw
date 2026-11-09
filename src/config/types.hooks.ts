@@ -12,8 +12,6 @@ export type HookMappingConfig = {
   id?: string;
   match?: HookMappingMatch;
   action?: "wake" | "agent";
-  postRun?: "trigger-heartbeat" | null;
-  /** @deprecated Use postRun instead. */
   wakeMode?: "now" | "next-heartbeat";
   name?: string;
   sessionKey?: string;
